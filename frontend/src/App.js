@@ -11,8 +11,15 @@ function App() {
   const currentUser = "Pasindu";
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
+  const [newPlace, setNewPlace] = useState(null);
   const [mapboxGL, setMapboxGL] = useState(null);
-  const [zoom, setZoom] = useState(8);
+  const [viewport, setViewport] = useState({
+    width: "100vw",
+    height: "100vh",
+    latitude: 7.491833015213317,
+    longitude: 80.583140512122,
+    zoom: 6,
+  });
 
   useEffect(() => {
     import("mapbox-gl").then((mapboxgl) => {
@@ -25,7 +32,6 @@ function App() {
       try {
         const res = await axios.get("http://localhost:5000/api/pins");
         setPins(res.data);
-        //console.log(res.data);
       } catch (e) {
         console.log(e);
       }
@@ -38,34 +44,45 @@ function App() {
     return <div>Loading map...</div>;
   }
 
-  const handleMapClick = (id) => {
+  const handleMarkerClick = (id, lat, long) => {
     setCurrentPlaceId(id);
+    setViewport((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: long,
+    }));
+  };
+
+  const handleAddClick = (e) => {
+    const { lat, lng } = e.lngLat;
+    setNewPlace({
+      lat,
+      long: lng,
+    });
   };
 
   return (
     <div className="App">
       <Map
         mapLib={mapboxGL}
-        initialViewState={{
-          longitude: 80.583140512122,
-          latitude: 7.491833015213317,
-          zoom: zoom,
-        }}
+        {...viewport}
         style={{ width: "100vw", height: "100vh" }}
         mapboxAccessToken="pk.eyJ1IjoicGFzaW5kdTEyMyIsImEiOiJjbHhhZnpzaDYyaW40MmpzNGR0NmM1azB1In0.wuRFvheBBMDqDj79dQHaHQ"
         mapStyle="mapbox://styles/mapbox/streets-v9"
-        onZoom={(e) => setZoom(e.viewState.zoom)}
+        onMove={(evt) => setViewport(evt.viewState)}
+        onDblClick={handleAddClick}
+        transitionDuration="200"
       >
         {pins.map((p) => (
           <React.Fragment key={p._id}>
             <Marker longitude={p.long} latitude={p.lat} anchor="bottom">
               <RoomIcon
                 style={{
-                  color: p.username === currentUser ? "tomato" : "salatblue",
-                  fontSize: `${zoom * 4}px`,
+                  color: p.username === currentUser ? "tomato" : "blue",
+                  fontSize: viewport.zoom * 7,
                   cursor: "pointer",
                 }}
-                onClick={() => handleMapClick(p._id)}
+                onClick={() => handleMarkerClick(p._id, p.lat, p.long)}
               />
               <div>Location</div>
             </Marker>
@@ -109,6 +126,58 @@ function App() {
             )}
           </React.Fragment>
         ))}
+        {newPlace && (
+          <Popup
+            longitude={newPlace.long}
+            latitude={newPlace.lat}
+            closeButton={true}
+            closeOnClick={false}
+            anchor="left"
+            onClose={() => setNewPlace(null)}
+          >
+            <div className="flex flex-col justify-around p-4 w-64 bg-white rounded-md shadow-lg">
+              <form className="space-y-4">
+                <div className="flex flex-col">
+                  <label className="mb-1 text-sm font-semibold text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter a title"
+                    className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-1 text-sm font-semibold text-gray-700">
+                    Review
+                  </label>
+                  <textarea
+                    placeholder="Say something about this place"
+                    className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label className="mb-1 text-sm font-semibold text-gray-700">
+                    Rating
+                  </label>
+                  <select className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full p-2 mt-2 text-white bg-blue-500 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                >
+                  Add Pin
+                </button>
+              </form>
+            </div>
+          </Popup>
+        )}
       </Map>
     </div>
   );
