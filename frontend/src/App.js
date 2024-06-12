@@ -8,6 +8,7 @@ import axios from "axios";
 //import { format } from "timego.js";
 
 function App() {
+  const currentUser = "Pasindu";
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [mapboxGL, setMapboxGL] = useState(null);
@@ -60,7 +61,7 @@ function App() {
             <Marker longitude={p.long} latitude={p.lat} anchor="bottom">
               <RoomIcon
                 style={{
-                  color: "red",
+                  color: p.username === currentUser ? "tomato" : "salatblue",
                   fontSize: `${zoom * 4}px`,
                   cursor: "pointer",
                 }}
