@@ -5,12 +5,13 @@ import StarRateIcon from "@mui/icons-material/StarRate";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./index.css";
 import axios from "axios";
+//import { format } from "timego.js";
 
 function App() {
   const [pins, setPins] = useState([]);
+  const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [mapboxGL, setMapboxGL] = useState(null);
   const [zoom, setZoom] = useState(8);
-  const [showPopup, setShowPopup] = useState(true);
 
   useEffect(() => {
     import("mapbox-gl").then((mapboxgl) => {
@@ -23,6 +24,7 @@ function App() {
       try {
         const res = await axios.get("http://localhost:5000/api/pins");
         setPins(res.data);
+        //console.log(res.data);
       } catch (e) {
         console.log(e);
       }
@@ -34,6 +36,10 @@ function App() {
   if (!mapboxGL) {
     return <div>Loading map...</div>;
   }
+
+  const handleMapClick = (id) => {
+    setCurrentPlaceId(id);
+  };
 
   return (
     <div className="App">
@@ -52,17 +58,24 @@ function App() {
         {pins.map((p) => (
           <React.Fragment key={p._id}>
             <Marker longitude={p.long} latitude={p.lat} anchor="bottom">
-              <RoomIcon style={{ color: "red", fontSize: `${zoom * 4}px` }} />
+              <RoomIcon
+                style={{
+                  color: "red",
+                  fontSize: `${zoom * 4}px`,
+                  cursor: "pointer",
+                }}
+                onClick={() => handleMapClick(p._id)}
+              />
               <div>Location</div>
             </Marker>
-            {showPopup && (
+            {p._id === currentPlaceId && (
               <Popup
                 longitude={p.long}
                 latitude={p.lat}
                 closeButton={true}
                 closeOnClick={false}
                 anchor="left"
-                onClose={() => setShowPopup(false)}
+                onClose={() => setCurrentPlaceId(null)}
               >
                 <div className="flex flex-col justify-around w-64 h-64">
                   <label className="p-1 mx-3 text-xs text-red-600 border-2 border-b-red-400">
