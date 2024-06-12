@@ -4,9 +4,13 @@ const dotenv = require("dotenv");
 const app = express();
 const pinRouter = require("./routes/Pin");
 const userRouter = require("./routes/User");
+const cors = require("cors");
 
 dotenv.config();
 
+// Use CORS middleware
+app.use(cors());
+// Your other middleware and routes
 app.use(express.json());
 
 mongoose
