@@ -6,6 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import "./index.css";
 import axios from "axios";
 import Register from "./components/Register";
+import Login from "./components/Login";
 //import { format } from "timego.js";
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
   const [title, setTitle] = useState(null);
   const [desc, setDesc] = useState(null);
   const [rating, setRating] = useState(0);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [mapboxGL, setMapboxGL] = useState(null);
   const [viewport, setViewport] = useState({
     width: "100vw",
@@ -214,15 +217,22 @@ function App() {
           </div>
         ) : (
           <div className="absolute space-x-2 top-4 right-4">
-            <button className="px-4 py-2 font-semibold text-white transition duration-300 bg-blue-500 rounded shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+            <button
+              onClick={() => setShowLogin(true)}
+              className="px-4 py-2 font-semibold text-white transition duration-300 bg-blue-500 rounded shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
               Login
             </button>
-            <button className="px-4 py-2 font-semibold text-white transition duration-300 bg-green-500 rounded shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300">
+            <button
+              onClick={() => setShowRegister(true)}
+              className="px-4 py-2 font-semibold text-white transition duration-300 bg-green-500 rounded shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300"
+            >
               Register
             </button>
           </div>
         )}
-        <Register />
+        {showLogin && <Login setShowLogin={setShowLogin} />}
+        {showRegister && <Register setShowRegister={setShowRegister} />}
       </Map>
     </div>
   );
