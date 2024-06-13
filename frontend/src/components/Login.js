@@ -3,7 +3,7 @@ import RoomIcon from "@mui/icons-material/Room";
 import CancelIcon from "@mui/icons-material/Cancel";
 import axios from "axios";
 
-const Login = ({ setShowLogin }) => {
+const Login = ({ setShowLogin, myStorage, setCurrentUser }) => {
   const [error, setError] = useState(false);
   const nameRef = useRef();
   const passwordRef = useRef();
@@ -15,10 +15,17 @@ const Login = ({ setShowLogin }) => {
       password: passwordRef.current.value,
     };
     try {
-      await axios.post("http://localhost:5000/api/users/login", user);
-
+      const res = await axios.post(
+        "http://localhost:5000/api/users/login",
+        user
+      );
+      console.log(res.data);
+      myStorage.setItem("user", res.data.username);
+      setCurrentUser(res.data.username);
       setError(false);
+      setShowLogin(false);
     } catch (error) {
+      console.log(error);
       setError(true);
     }
   };
