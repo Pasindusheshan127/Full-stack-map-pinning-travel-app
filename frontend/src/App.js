@@ -5,10 +5,11 @@ import StarRateIcon from "@mui/icons-material/StarRate";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "./index.css";
 import axios from "axios";
+import Register from "./components/Register";
 //import { format } from "timego.js";
 
 function App() {
-  const currentUser = "Pasindu";
+  const [currentUser, setCurrentUser] = useState(null);
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
@@ -157,7 +158,7 @@ function App() {
             anchor="left"
             onClose={() => setNewPlace(null)}
           >
-            <div className="flex flex-col justify-around p-4 w-64 bg-white rounded-md shadow-lg">
+            <div className="flex flex-col justify-around w-64 p-4 bg-white rounded-md shadow-lg">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex flex-col">
                   <label className="mb-1 text-sm font-semibold text-gray-700">
@@ -205,6 +206,23 @@ function App() {
             </div>
           </Popup>
         )}
+        {currentUser ? (
+          <div className="absolute space-x-2 top-4 right-4">
+            <button className="px-4 py-2 font-semibold text-white transition duration-300 bg-red-500 rounded shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+              Log out
+            </button>
+          </div>
+        ) : (
+          <div className="absolute space-x-2 top-4 right-4">
+            <button className="px-4 py-2 font-semibold text-white transition duration-300 bg-blue-500 rounded shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+              Login
+            </button>
+            <button className="px-4 py-2 font-semibold text-white transition duration-300 bg-green-500 rounded shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300">
+              Register
+            </button>
+          </div>
+        )}
+        <Register />
       </Map>
     </div>
   );
