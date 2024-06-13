@@ -12,6 +12,9 @@ function App() {
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
+  const [title, setTitle] = useState(null);
+  const [desc, setDesc] = useState(null);
+  const [rating, setRating] = useState(0);
   const [mapboxGL, setMapboxGL] = useState(null);
   const [viewport, setViewport] = useState({
     width: "100vw",
@@ -61,6 +64,25 @@ function App() {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const newPin = {
+      username: currentUser,
+      title,
+      desc,
+      rating,
+      lat: newPlace.lat,
+      long: newPlace.long,
+    };
+    try {
+      const res = await axios.post("http://localhost:5000/api/pins", newPin);
+      setPins([...pins, res.data]);
+      setNewPlace(null);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div className="App">
       <Map
@@ -108,11 +130,11 @@ function App() {
                     Rating
                   </label>
                   <div className="mx-4">
-                    <StarRateIcon className="text-yellow-600" />
-                    <StarRateIcon className="text-yellow-600" />
-                    <StarRateIcon className="text-yellow-600" />
-                    <StarRateIcon className="text-yellow-600" />
-                    <StarRateIcon className="text-yellow-600" />
+                    {Array(p.rating)
+                      .fill()
+                      .map((_, index) => (
+                        <StarRateIcon key={index} className="text-yellow-600" />
+                      ))}
                   </div>
                   <label className="p-1 mx-3 text-xs text-red-600 border-2 border-b-red-400">
                     Information
@@ -136,7 +158,7 @@ function App() {
             onClose={() => setNewPlace(null)}
           >
             <div className="flex flex-col justify-around p-4 w-64 bg-white rounded-md shadow-lg">
-              <form className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex flex-col">
                   <label className="mb-1 text-sm font-semibold text-gray-700">
                     Title
@@ -145,6 +167,7 @@ function App() {
                     type="text"
                     placeholder="Enter a title"
                     className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                    onChange={(e) => setTitle(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col">
@@ -154,13 +177,17 @@ function App() {
                   <textarea
                     placeholder="Say something about this place"
                     className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                    onChange={(e) => setDesc(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col">
                   <label className="mb-1 text-sm font-semibold text-gray-700">
                     Rating
                   </label>
-                  <select className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+                  <select
+                    onChange={(e) => setRating(e.target.value)}
+                    className="p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+                  >
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
