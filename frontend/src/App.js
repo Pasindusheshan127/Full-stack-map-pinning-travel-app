@@ -11,7 +11,7 @@ import Login from "./components/Login";
 
 function App() {
   const myStorage = window.localStorage;
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(myStorage.getItem("user"));
   const [pins, setPins] = useState([]);
   const [currentPlaceId, setCurrentPlaceId] = useState(null);
   const [newPlace, setNewPlace] = useState(null);
@@ -86,6 +86,11 @@ function App() {
     } catch (e) {
       console.log(e);
     }
+  };
+
+  const handleLogout = () => {
+    myStorage.removeItem("user");
+    setCurrentUser(null);
   };
 
   return (
@@ -212,7 +217,10 @@ function App() {
         )}
         {currentUser ? (
           <div className="absolute space-x-2 top-4 right-4">
-            <button className="px-4 py-2 font-semibold text-white transition duration-300 bg-red-500 rounded shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 font-semibold text-white transition duration-300 bg-red-500 rounded shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
+            >
               Log out
             </button>
           </div>
